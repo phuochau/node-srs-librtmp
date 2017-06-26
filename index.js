@@ -17,6 +17,14 @@ var IntRefPtrPtr = ref.refType(IntRefPtr);
 var Char = ref.types.char;
 var CharPtr = ref.refType(Char);
 
+function readUInt24BE (buffer, offset) { // right function to read 3 bytes
+  var val = 0;
+  val |= buffer[offset + 0];
+  val |= buffer[offset + 1] << 8;
+  val |= buffer[offset + 2] << 16;
+  return val;
+}
+
 var libfactorial = ffi.Library('./libfactorial', {
   'srs_rtmp_create': [ voidRefPtr, [ 'string' ] ],
   'srs_rtmp_handshake': ['int', [voidRefPtr]],
@@ -96,7 +104,7 @@ while(continueRead) {
   var ptime = new Buffer(4);
   const r = libfactorial.srs_flv_read_tag_header(flv_ref, ptype, pdata_size, ptime);
   ptype = ptype.readInt8(0);
-  // pdata_size = pdata_size.readIntBE(0, 3); // wrong at read data_size, see p75: http://download.macromedia.com/f4v/video_file_format_spec_v10_1.pdf
+  pdata_size = readUInt24BE(pdata_size, 0) // wrong at read data_size, see p75: http://download.macromedia.com/f4v/video_file_format_spec_v10_1.pdf
   ptime = ptime.readInt32BE(0);
   console.log('ptype', ptype);
   console.log('pdata_size', pdata_size);
