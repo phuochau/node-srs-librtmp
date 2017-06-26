@@ -1,0 +1,35 @@
+{
+  "name": "node-srs-librtmp",
+  "version": "1.0.0",
+  "description": "Port srs-librtmp to node addon",
+  "main": "index.js",
+  "scripts": {
+    "autogypi": "autogypi",
+    "node-gyp": "node-gyp",
+    "emcc-path": "emcc-path",
+    "copyasm": "copyasm",
+    "ndts": "ndts",
+    "install": "node-gyp rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phuochau/node-srs-librtmp.git"
+  },
+  "keywords": [
+    "srs",
+    "librtmp",
+    "node-addon"
+  ],
+  "author": "Hau Vo",
+  "license": "MIT",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/phuochau/node-srs-librtmp/issues"
+  },
+  "homepage": "https://github.com/phuochau/node-srs-librtmp#readme",
+  "dependencies": {
+    "ffi": "^2.2.0",
+    "ref": "^1.3.4",
+    "sleep": "^5.1.1"
+  }
+}
