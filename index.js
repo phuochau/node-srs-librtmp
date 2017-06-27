@@ -38,12 +38,12 @@ var libfactorial = ffi.Library('./libfactorial', {
 const url = 'rtmp://127.0.0.1:1935/live/flvtest';
 const test_file = "./test.flv";
 
-// const rtmpCon = libfactorial.srs_rtmp_create(url);
-// console.log(rtmpCon);
-// console.log(libfactorial.srs_rtmp_handshake(rtmpCon));
-// console.log(libfactorial.srs_rtmp_connect_app(rtmpCon));
-//
-// console.log(libfactorial.srs_rtmp_publish_stream(rtmpCon));
+const rtmpCon = libfactorial.srs_rtmp_create(url);
+console.log(rtmpCon);
+console.log(libfactorial.srs_rtmp_handshake(rtmpCon));
+console.log(libfactorial.srs_rtmp_connect_app(rtmpCon));
+
+console.log(libfactorial.srs_rtmp_publish_stream(rtmpCon));
 
 // open flv file
 const flv_ref = libfactorial.srs_flv_open_read(test_file);
@@ -112,7 +112,9 @@ while(continueRead) {
     // console.log(flv_data.toString());
     console.log('===========================')
     currentPos += sizeTag;
-    // libfactorial.srs_rtmp_write_packet(rtmpCon, ptype.deref(), ptime.deref(), c, pdata_size.deref() + 11);
+    var c = Buffer(4096);
+    c.write(flv_data.toString());
+    console.log(libfactorial.srs_rtmp_write_packet(rtmpCon, ptype, ptime, c.toString(), pdata_size));
   } else {
     continueRead = false;
   }
