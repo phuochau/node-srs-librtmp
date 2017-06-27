@@ -17,14 +17,6 @@ var IntRefPtrPtr = ref.refType(IntRefPtr);
 var Char = ref.types.char;
 var CharPtr = ref.refType(Char);
 
-function readUInt24BE (buffer, offset) { // right function to read 3 bytes
-  var val = 0;
-  val |= buffer[offset + 0];
-  val |= buffer[offset + 1] << 8;
-  val |= buffer[offset + 2] << 16;
-  return val;
-}
-
 var libfactorial = ffi.Library('./libfactorial', {
   'srs_rtmp_create': [ voidRefPtr, [ 'string' ] ],
   'srs_rtmp_handshake': ['int', [voidRefPtr]],
@@ -97,15 +89,15 @@ let currentPos = header_size + 4; // 4 bytes of prev tag
 let continueRead = true;
 while(continueRead) {
   console.log('currentPos', currentPos);
-  libfactorial.srs_flv_lseek(flv_ref, currentPos);
+  // libfactorial.srs_flv_lseek(flv_ref, currentPos); // no need to seek, autoseek
 
   var ptype = new Buffer(1);
   var pdata_size = new Buffer(3);
   var ptime = new Buffer(4);
   const r = libfactorial.srs_flv_read_tag_header(flv_ref, ptype, pdata_size, ptime);
   ptype = ptype.readInt8(0);
-  pdata_size = readUInt24BE(pdata_size, 0) // wrong at read data_size, see p75: http://download.macromedia.com/f4v/video_file_format_spec_v10_1.pdf
-  ptime = ptime.readInt32BE(0);
+  pdata_size = pdata_size.readUIntLE(0, 3) // wrong at read data_size, see p75: http://download.macromedia.com/f4v/video_file_format_spec_v10_1.pdf
+  ptime = ptime.readInt32LE(0);
   console.log('ptype', ptype);
   console.log('pdata_size', pdata_size);
   console.log('ptime', ptime);
@@ -114,11 +106,11 @@ while(continueRead) {
   if (r === 0 && ptime >= 0) {
     var flv_data = new Buffer(pdata_size);
     console.log(libfactorial.srs_flv_read_tag_data(flv_ref, flv_data, pdata_size));
+    var sizeTag = libfactorial.srs_flv_size_tag(pdata_size);
+    console.log('sizeOfTag', sizeTag);
     console.log('========== DATA ===========');
     // console.log(flv_data.toString());
     console.log('===========================')
-    var sizeTag = libfactorial.srs_flv_size_tag(pdata_size);
-    console.log('sizeOfTag', sizeTag);
     currentPos += sizeTag;
     // libfactorial.srs_rtmp_write_packet(rtmpCon, ptype.deref(), ptime.deref(), c, pdata_size.deref() + 11);
   } else {
