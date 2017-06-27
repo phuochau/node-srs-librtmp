@@ -19,11 +19,12 @@ var CharPtr = ref.refType(Char);
 
 var libfactorial = ffi.Library('./libfactorial', {
   'srs_rtmp_create': [ voidRefPtr, [ 'string' ] ],
+  'srs_rtmp_destroy': ['void', [voidRefPtr]],
   'srs_rtmp_handshake': ['int', [voidRefPtr]],
   'srs_rtmp_connect_app': ['int', [voidRefPtr]],
   'srs_rtmp_get_server_id': ['int', [voidRefPtr, StringRefPtrPtr, IntRefPtr, IntRefPtr]],
   'srs_rtmp_publish_stream': ['int', [voidRefPtr]],
-  'srs_rtmp_write_packet': ['int', [voidRefPtr, Char, 'int', 'string', 'int']],
+  'srs_rtmp_write_packet': ['int', [voidRefPtr, 'int', 'int', 'string', 'int']],
   'srs_h264_write_raw_frames': ['int', [voidRefPtr, 'string', 'int', 'int', 'int']],
   'srs_h264_startswith_annexb': ['int', ['string', 'int', IntRefPtr]],
   'srs_flv_open_read': [voidRefPtr, ['string']],
@@ -35,7 +36,7 @@ var libfactorial = ffi.Library('./libfactorial', {
   'srs_flv_lseek': ['void', [voidRefPtr, 'int']],
 
 });
-const url = 'rtmp://127.0.0.1:1935/live/flvtest';
+const url = 'rtmp://127.0.0.1:1935/live/node';
 const test_file = "./test.flv";
 
 const rtmpCon = libfactorial.srs_rtmp_create(url);
@@ -105,24 +106,23 @@ while(continueRead) {
 
   if (r === 0 && ptime >= 0) {
     var flv_data = new Buffer(pdata_size);
-    console.log(libfactorial.srs_flv_read_tag_data(flv_ref, flv_data, pdata_size));
+    libfactorial.srs_flv_read_tag_data(flv_ref, flv_data, pdata_size);
     var sizeTag = libfactorial.srs_flv_size_tag(pdata_size);
     console.log('sizeOfTag', sizeTag);
     console.log('========== DATA ===========');
-    // console.log(flv_data.toString());
+    // console.log(flv_data);
     console.log('===========================')
     currentPos += sizeTag;
-    var c = Buffer(4096);
-    c.write(flv_data.toString());
-    // not only send tag data, we need send all tag (header + data)
-    console.log(libfactorial.srs_rtmp_write_packet(rtmpCon, ptype, ptime, c, sizeTag));
+
+    console.log(libfactorial.srs_rtmp_write_packet(rtmpCon, ptype, ptime, flv_data.toString('ascii'), sizeTag));
   } else {
     continueRead = false;
   }
-  sleep.sleep(3);
+  // sleep.sleep(1);
 }
 
 libfactorial.srs_flv_close(flv_ref);
+libfactorial.srs_rtmp_destroy(rtmpCon);
 console.log('end');
 //
 
