@@ -114,7 +114,8 @@ while(continueRead) {
     currentPos += sizeTag;
     var c = Buffer(4096);
     c.write(flv_data.toString());
-    console.log(libfactorial.srs_rtmp_write_packet(rtmpCon, ptype, ptime, c.toString(), pdata_size));
+    // not only send tag data, we need send all tag (header + data)
+    console.log(libfactorial.srs_rtmp_write_packet(rtmpCon, ptype, ptime, c, sizeTag));
   } else {
     continueRead = false;
   }
