@@ -2,6 +2,7 @@ var ffi = require('ffi')
 var ref = require('ref')
 var fs = require('fs')
 var sleep = require('sleep');
+var amfUtils = require('./amfUtils');
 
 var voidRef = ref.types.void;
 var voidRefPtr = ref.refType(voidRef);
@@ -17,7 +18,7 @@ var IntRefPtrPtr = ref.refType(IntRefPtr);
 var Char = ref.types.char;
 var CharPtr = ref.refType(Char);
 
-var libfactorial = ffi.Library('./libfactorial', {
+var libfactorial = ffi.Library('./rtmp', {
   'srs_rtmp_create': [ voidRefPtr, [ 'string' ] ],
   'srs_rtmp_destroy': ['void', [voidRefPtr]],
   'srs_rtmp_handshake': ['int', [voidRefPtr]],
@@ -39,7 +40,7 @@ var libfactorial = ffi.Library('./libfactorial', {
   'srs_rtmp_is_onMetaData': ['bool', ['int', 'string', 'int']]
 
 });
-const url = 'rtmp://127.0.0.1:1935/live/node';
+const url = 'rtmp://127.0.0.1:1935/live/srs';
 const test_file = "./test.flv";
 
 const rtmpCon = libfactorial.srs_rtmp_create(url);
@@ -110,13 +111,6 @@ while(continueRead) {
     var flv_data = new Buffer(pdata_size);
     libfactorial.srs_flv_read_tag_data(flv_ref, flv_data, pdata_size);
     var sizeTag = libfactorial.srs_flv_size_tag(pdata_size);
-    if (libfactorial.srs_rtmp_is_onMetaData(ptype, flv_data, pdata_size)) {
-      // var dataFrameData = new Buffer(1024);
-      // dataFrameData.write('@setDataFrame');
-      // flv_data = Buffer.concat([dataFrameData, flv_data]);
-      console.log('Continue');
-      continue;
-    } 
     console.log('sizeOfTag', sizeTag);
     console.log('========== DATA ===========');
     // console.log(flv_data);

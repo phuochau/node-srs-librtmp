@@ -1,36 +1,60 @@
-var ffi = require('ffi')
-var ref = require('ref')
-var fs = require('fs')
+const { bufPtrToObject } = require('./src/refs');
+const loadRTMPLib = require('./src/clib');
 var sleep = require('sleep');
 
-var voidRef = ref.types.void;
-var voidRefPtr = ref.refType(voidRef);
-var voidRefPtrPtr = ref.refType(voidRefPtr);
+const lib = loadRTMPLib('./librtmp/librtmp.1');
 
-var StringRef = 'string';
-var StringRefPtr = ref.refType(StringRef);
-var StringRefPtrPtr = ref.refType(StringRefPtr);
+if (!lib) {
+  console.log('Cannot load library');
+}
 
-var IntRef = ref.types.int;
-var IntRefPtr = ref.refType(IntRef);
-var IntRefPtrPtr = ref.refType(IntRefPtr);
+const serverURL = 'rtmp://127.0.0.1:1935/live/bravo';
 
-var CharRef = ref.types.char;
-var CharRefPtr = ref.refType(CharRef);
+const rtmp = lib.RTMP_Alloc();
+lib.RTMP_Init(rtmp);
 
-var librtmp = ffi.Library('./librtmp/librtmp.1', {
-  'RTMP_Alloc': [voidRefPtr, []],
-  'RTMP_Init': ['void', [voidRefPtr]],
-  'RTMP_SetupURL': ['int', [voidRefPtr, 'string']],
-  'RTMP_EnableWrite': ['void', [voidRefPtr]],
-  'RTMP_NGINX': ['int', []]
-});
+if (!lib.RTMP_SetupURL(rtmp, serverURL)) {
+  lib.RTMP_Log(1, "SetupURL Err\n");
+  lib.RTMP_Free(rtmp);
+  return -1;
+}
 
-// define variable
-const url = 'rtmp://127.0.0.1:1935/live/node';
-const test_file = "./test.flv";
+// enable write
+lib.RTMP_EnableWrite(rtmp);
+//1hour
+lib.RTMP_SetBufferMS(rtmp, 3600 * 1000);
 
-// alloc
-librtmp.RTMP_NGINX();
+if (!lib.RTMP_Connect(rtmp, null)) {
+    lib.RTMP_Log(1, "Connect Err\n");
+    lib.RTMP_Free(rtmp);
+    return -1;
+}
 
-console.log('end');
+if (!lib.RTMP_ConnectStream(rtmp, 0)) {
+    lib.RTMP_Log(1, "ConnectStream Err\n");
+    lib.RTMP_Close(rtmp);
+    lib.RTMP_Free(rtmp);
+    return -1;
+}
+
+console.log('start sending data...');
+
+const metadata = lib.build_metadata();
+
+while(true) {
+    if (!lib.RTMP_Write(rtmp, metadata, metadata.length)) {
+        lib.RTMP_Log(1, "Cant send metadata Err\n");
+        lib.RTMP_Close(rtmp);
+        lib.RTMP_Free(rtmp);
+        break;
+    }
+    console.log('sent');
+    sleep.sleep(1);
+}
+
+if (rtmp != null) {
+    lib.RTMP_Close(rtmp);
+    lib.RTMP_Free(rtmp);
+}
+
+console.log('end process');

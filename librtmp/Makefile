@@ -78,7 +78,7 @@ CFLAGS=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT) $(SO_DEF)
 LDFLAGS=$(XLDFLAGS)
 
 
-OBJS=rtmp.o log.o amf.o hashswf.o parseurl.o send_flv.o
+OBJS=rtmp.o log.o amf.o hashswf.o parseurl.o rtmp_helper.o send_flv.o
 
 all:	librtmp.a $(SO_LIB)
 
@@ -93,10 +93,11 @@ librtmp$(SO_EXT): $(OBJS)
 	ln -sf $@ librtmp.$(SOX)
 
 log.o: log.c log.h Makefile
-rtmp.o: rtmp.c rtmp.h rtmp_sys.h handshake.h dh.h log.h amf.h lwlog.h send_flv.h Makefile
+rtmp.o: rtmp.c rtmp.h rtmp_sys.h handshake.h dh.h log.h amf.h lwlog.h Makefile
 amf.o: amf.c amf.h bytes.h log.h Makefile
 hashswf.o: hashswf.c http.h rtmp.h rtmp_sys.h Makefile
 parseurl.o: parseurl.c rtmp.h rtmp_sys.h log.h Makefile
+rtmp_helper.o: rtmp_helper.h Makefile
 send_flv.o: send_flv.h Makefile
 
 librtmp.pc: librtmp.pc.in Makefile
@@ -110,7 +111,7 @@ install:	install_base $(SO_INST)
 
 install_base:	librtmp.a librtmp.pc
 	-mkdir -p $(INCDIR) $(LIBDIR)/pkgconfig $(MANDIR)/man3 $(SODIR)
-	cp amf.h http.h log.h rtmp.h send_flv.h $(INCDIR)
+	cp amf.h http.h log.h rtmp.h rtmp_helper.h send_flv.h $(INCDIR)
 	cp librtmp.a $(LIBDIR)
 	cp librtmp.pc $(LIBDIR)/pkgconfig
 	cp librtmp.3 $(MANDIR)/man3

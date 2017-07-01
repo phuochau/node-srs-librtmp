@@ -270,7 +270,7 @@ int publish_using_write() {
     RTMP *rtmp = NULL;
 
     FILE *fp = NULL;
-    fp = fopen("test.flv", "rb");
+    fp = fopen("test_injected.flv", "rb");
     if (NULL == fp) {
         RTMP_LogPrintf("Open File Error.\n");
         return -1;

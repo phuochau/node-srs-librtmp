@@ -9,7 +9,8 @@
     "emcc-path": "emcc-path",
     "copyasm": "copyasm",
     "ndts": "ndts",
-    "install": "node-gyp rebuild"
+    "install": "node-gyp rebuild",
+    "build:rtmp": "cd librtmp & sudo make SYS=darwin"
   },
   "repository": {
     "type": "git",
