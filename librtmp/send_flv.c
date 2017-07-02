@@ -116,7 +116,7 @@ int publish_using_packet() {
     RTMP_Init(rtmp);
     //set connection timeout,default 30s
     rtmp->Link.timeout = 5;
-    if (!RTMP_SetupURL(rtmp, "rtmp://127.0.0.1:1935/live/inrtmp")) {
+    if (!RTMP_SetupURL(rtmp, "rtmp://192.168.99.100:32773/live/inrtmp")) {
         RTMP_Log(RTMP_LOGERROR, "SetupURL Err\n");
         RTMP_Free(rtmp);
         return -1;
@@ -284,7 +284,7 @@ int publish_using_write() {
     RTMP_Init(rtmp);
     //set connection timeout,default 30s
     rtmp->Link.timeout = 5;
-    if (!RTMP_SetupURL(rtmp, "rtmp://127.0.0.1:1935/live/inrtmp")) {
+    if (!RTMP_SetupURL(rtmp, "rtmp://192.168.99.100:32773/live/inrtmp")) {
         RTMP_Log(RTMP_LOGERROR, "SetupURL Err\n");
         RTMP_Free(rtmp);
         return -1;
@@ -404,8 +404,8 @@ int publish_using_write() {
 
 int RTMP_NGINX() {
     //2 Methods:
-    // publish_using_packet();
-    publish_using_write();
+    publish_using_packet();
+    // publish_using_write();
 
     return 0;
 }

@@ -2,7 +2,6 @@ var ffi = require('ffi')
 var ref = require('ref')
 var fs = require('fs')
 var sleep = require('sleep');
-var amfUtils = require('./amfUtils');
 
 var voidRef = ref.types.void;
 var voidRefPtr = ref.refType(voidRef);
@@ -40,8 +39,8 @@ var libfactorial = ffi.Library('./rtmp', {
   'srs_rtmp_is_onMetaData': ['bool', ['int', 'string', 'int']]
 
 });
-const url = 'rtmp://127.0.0.1:1935/live/srs';
-const test_file = "./test.flv";
+const url = 'rtmp://192.168.99.100:32773/live/srsrtmp';
+const test_file = "./test_srs_injecter.flv";
 
 const rtmpCon = libfactorial.srs_rtmp_create(url);
 console.log(rtmpCon);
@@ -94,7 +93,7 @@ let currentPos = header_size + 4; // 4 bytes of prev tag
 let continueRead = true;
 while(continueRead) {
   console.log('currentPos', currentPos);
-  // libfactorial.srs_flv_lseek(flv_ref, currentPos); // no need to seek, autoseek
+  libfactorial.srs_flv_lseek(flv_ref, currentPos); // no need to seek, autoseek
 
   var ptype = new Buffer(1);
   var pdata_size = new Buffer(3);
@@ -108,20 +107,24 @@ while(continueRead) {
   console.log('ptime', ptime);
 
   if (r === 0 && ptime >= 0) {
+    // currentPos -= 11;
+    // libfactorial.srs_flv_lseek(flv_ref, currentPos); // move to prev
+
     var flv_data = new Buffer(pdata_size);
     libfactorial.srs_flv_read_tag_data(flv_ref, flv_data, pdata_size);
     var sizeTag = libfactorial.srs_flv_size_tag(pdata_size);
     console.log('sizeOfTag', sizeTag);
     console.log('========== DATA ===========');
-    // console.log(flv_data);
+    console.log(flv_data.toString());
     console.log('===========================')
     currentPos += sizeTag;
 
+    // const finalBuffer = 
     console.log(libfactorial.srs_rtmp_write_packet(rtmpCon, ptype, ptime, flv_data, flv_data.length));
   } else {
     continueRead = false;
   }
-  sleep.sleep(1);
+  sleep.msleep(1000);
 }
 
 libfactorial.srs_flv_close(flv_ref);

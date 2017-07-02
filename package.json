@@ -10,7 +10,9 @@
     "copyasm": "copyasm",
     "ndts": "ndts",
     "install": "node-gyp rebuild",
-    "build:rtmp": "cd librtmp & sudo make SYS=darwin"
+    "build:rtmp": "cd librtmp & sudo make SYS=darwin",
+    "build:srs": "clang++ -dynamiclib -o srsrtmp.dylib ./lib/srs_librtmp.cpp ./lib/srs_injecter.cpp",
+    "build:srs2": "g++ -c ./lib/srs_librtmp.cpp ./lib/srs_injecter.cpp"
   },
   "repository": {
     "type": "git",
