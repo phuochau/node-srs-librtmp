@@ -4,15 +4,7 @@
   "description": "Port srs-librtmp to node addon",
   "main": "index.js",
   "scripts": {
-    "autogypi": "autogypi",
-    "node-gyp": "node-gyp",
-    "emcc-path": "emcc-path",
-    "copyasm": "copyasm",
-    "ndts": "ndts",
-    "install": "node-gyp rebuild",
-    "build:rtmp": "cd librtmp & sudo make SYS=darwin",
-    "build:srs": "clang++ -dynamiclib -o srsrtmp.dylib ./lib/srs_librtmp.cpp ./lib/srs_injecter.cpp",
-    "build:srs2": "g++ -c ./lib/srs_librtmp.cpp ./lib/srs_injecter.cpp"
+    "build:cpp": "mkdir build & clang++ -dynamiclib -o ./build/srsrtmp.dylib ./lib/cpp/srs_librtmp.cpp"
   },
   "repository": {
     "type": "git",

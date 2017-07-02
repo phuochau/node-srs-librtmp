@@ -1,1 +1,0 @@
-int RTMP_NGINX();
