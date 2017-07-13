@@ -2,7 +2,7 @@ const { RTMP, FLV } = require('../lib')
 const sleep = require('sleep');
 
 const host = '192.168.99.100';
-const port = 32770;
+const port = 32772;
 const appName = 'live';
 const streamKey = 'srs';
 
@@ -17,6 +17,7 @@ const flvStream = new FLV(flv_path);
 flvStream.openStream();
 flvStream.readHeader();
 
+let i = 1;
 while(true) {
 
   const tag = flvStream.readNextTag();
@@ -28,9 +29,12 @@ while(true) {
     console.log("Can't send package: ", tag);
     break;
   }
-  console.log('Sent Package');
-  sleep.sleep(10);
+  console.log('Sent Package', i);
+  i++;
+  sleep.msleep(10);
 }
+
+// while(true) { }
 
 flvStream.closeStream();
 rtmpClient.disconnect();

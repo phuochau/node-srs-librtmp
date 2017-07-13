@@ -13,9 +13,10 @@
   "keywords": [
     "srs",
     "librtmp",
-    "node-addon"
+    "node-addon",
+    "node-rtmp"
   ],
-  "author": "Hau Vo",
+  "author": "Hau Vo (kevinvovn@gmail.com)",
   "license": "MIT",
   "gypfile": true,
   "bugs": {
