@@ -1,10 +1,10 @@
 {
   "name": "node-srs-librtmp",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Port srs-librtmp to node addon",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "build:cpp": "mkdir build & clang++ -dynamiclib -o ./build/srsrtmp.dylib ./lib/cpp/srs_librtmp.cpp"
+    "build:cpp:mac": "mkdir build & clang++ -dynamiclib -o ./build/srsrtmp.dylib ./lib/cpp/srs_librtmp.cpp"
   },
   "repository": {
     "type": "git",
